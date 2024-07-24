@@ -5,13 +5,13 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-public class User implements Serializable {
+public class UserModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    private String name;
+    private String username;
 
 
     private String email;
@@ -20,36 +20,41 @@ public class User implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
-
+    private String role;
     public enum AccountType {
         Klient, Dostawca
     }
 
     // Constructors (optional)
-    public User() {}
+    public UserModel() {}
 
-    public User( String name, String email, AccountType accountType, String password) {
-        this.name = name;
+    public UserModel( String username, String email, AccountType accountType, String password,String role) {
+        this.username = username;
         this.email = email;
         this.accountType = accountType;
         this.password = password;
+        this.role = role;
     }
-
     // Getters and Setters
     public Long getId() {
         return id;
     }
-
+    public String getRole(){
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
+    }
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String name) {
+        this.username = name;
     }
 
     public String getEmail() {
@@ -78,7 +83,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", name=" + name +
+        return "User [id=" + id + ", username=" + username +
                 ", email=" + email + ", accountType=" + accountType + ", password=" + password + "]";
     }
 }
