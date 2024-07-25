@@ -15,10 +15,7 @@ public class UserModel implements Serializable {
 
 
     private String email;
-
     private String password;
-
-    @Enumerated(EnumType.STRING)
     private String role;
 
     // Constructors (optional)

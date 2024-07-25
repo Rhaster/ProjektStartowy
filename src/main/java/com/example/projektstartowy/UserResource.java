@@ -40,12 +40,4 @@ public class UserResource {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK); // zwrócenie http status OK po usunieciu
     }
-    @GetMapping("/login")
-    public String handleLogin() {
-        return "customloginpage";
-    }
-    @GetMapping("/logout")
-    public String handleLogout() {
-        return "customloginpage";
-    }
 }
