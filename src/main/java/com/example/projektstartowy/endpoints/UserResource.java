@@ -1,4 +1,4 @@
-package com.example.projektstartowy;
+package com.example.projektstartowy.endpoints;
 
 import com.example.projektstartowy.model.UserModel;
 import com.example.projektstartowy.service.UserService;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 // Kontroler api
 @RestController// Mapowanie po /user
+@RequestMapping("/user")
 public class UserResource {
     private final UserService userService;  // zmienna do przechowania instancji klasy
 
