@@ -1,4 +1,4 @@
-package com.example.projektstartowy;
+package com.example.projektstartowy.logging;
 
 
 import com.example.projektstartowy.model.UserModel;

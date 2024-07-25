@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 // Kontroler api
-@RestController
-@RequestMapping("/user") // Mapowanie po /user
+@RestController// Mapowanie po /user
 public class UserResource {
     private final UserService userService;  // zmienna do przechowania instancji klasy
 
@@ -40,5 +39,13 @@ public class UserResource {
     public ResponseEntity<?> deleteUser(@PathVariable("id") long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK); // zwrócenie http status OK po usunieciu
+    }
+    @GetMapping("/login")
+    public String handleLogin() {
+        return "customloginpage";
+    }
+    @GetMapping("/logout")
+    public String handleLogout() {
+        return "customloginpage";
     }
 }

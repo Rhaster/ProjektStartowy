@@ -19,19 +19,14 @@ public class UserModel implements Serializable {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private AccountType accountType;
     private String role;
-    public enum AccountType {
-        Klient, Dostawca
-    }
 
     // Constructors (optional)
     public UserModel() {}
 
-    public UserModel( String username, String email, AccountType accountType, String password,String role) {
+    public UserModel( String username, String email, String password,String role) {
         this.username = username;
         this.email = email;
-        this.accountType = accountType;
         this.password = password;
         this.role = role;
     }
@@ -73,17 +68,11 @@ public class UserModel implements Serializable {
         this.password = password;
     }
 
-    public AccountType getAccountType() {
-        return accountType;
-    }
 
-    public void setAccountType(AccountType accountType) {
-        this.accountType = accountType;
-    }
 
     @Override
     public String toString() {
         return "User [id=" + id + ", username=" + username +
-                ", email=" + email + ", accountType=" + accountType + ", password=" + password + "]";
+                ", email=" + email + ", password=" + password + "]";
     }
 }

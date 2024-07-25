@@ -1,6 +1,7 @@
 package com.example.projektstartowy.config;
 
 
+import com.example.projektstartowy.logging.AuthenticationSuccessHandler;
 import com.example.projektstartowy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -32,11 +33,16 @@ public class Security {
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return  http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(registry->
     {
-        registry.requestMatchers("/home","/register/**").permitAll(); // zezwól na wejscie kazdemu na pole rejestracji
+        registry.requestMatchers("/home","/register/**","/login").permitAll(); // zezwól na wejscie kazdemu na pole rejestracji
         registry.requestMatchers("/admin/**").hasRole("ADMIN"); // zezwól na wejscie do panelu admina tylko adminom
         registry.requestMatchers("/user/**").hasRole("USER"); // zezwól na wejscie do panelu usera dla userów
         registry.anyRequest().authenticated(); // wszystko poza musi byc autoryzowane
-    }).formLogin(AbstractAuthenticationFilterConfigurer::permitAll).build();
+    }).formLogin(httpSecurityFormLoginConfigurer -> {
+        httpSecurityFormLoginConfigurer
+                .loginPage("/login")
+                .successHandler(new AuthenticationSuccessHandler())
+                .permitAll();
+    }).build();
 }
 @Bean
 public UserService  userDetailsService() {
