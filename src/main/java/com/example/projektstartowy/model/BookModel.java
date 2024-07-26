@@ -10,18 +10,14 @@ public class BookModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(name = "title", nullable = false)
     private String title;
-
     @Column(name = "publication_date")
     @Temporal(TemporalType.DATE)
     private Date publicationDate;
-
     @ManyToOne // Wielu do jednego bo jeden autor moze napisac wiele ksiazek
     @JoinColumn(name = "author_id", nullable = false)
     private AuthorModel author;
-
     // Gety i Sety dla ksiazki
     public Long getId() {
         return id;

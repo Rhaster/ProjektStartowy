@@ -5,15 +5,12 @@ import java.util.Date;
  // Model dla Zamówień, zawiera klucz obcy do tabeli Users
 @Entity
 public class OrderModel {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false, updatable = false)
     private Long orderID;
-
     @Column(name = "name", nullable = false)
     private String name;
-
     @Column(name = "rent_date_start")
     @Temporal(TemporalType.DATE)
     private Date rentDateStart;
@@ -21,7 +18,7 @@ public class OrderModel {
     @Temporal(TemporalType.DATE)
     private Date rateDateEnd;
     @ManyToOne  // Wielu do jednego bo jeden klient moze miec wiele zamówien
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     private UserModel customer;
     // Getty i Setty
     public Long getOrderID() {
@@ -54,4 +51,10 @@ public class OrderModel {
     public void setCustomer(UserModel customer) {
         this.customer = customer;
     }
+    @Override
+     public String toString() {
+        return " orderID = " + orderID + " name =" + name + " rentDateStart = "
+                + rentDateStart + " rateDateEnd = " + rateDateEnd + " customer = " + customer;
+    }
+
 }

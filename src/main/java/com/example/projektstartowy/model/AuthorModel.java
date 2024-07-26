@@ -3,7 +3,7 @@ package com.example.projektstartowy.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-
+// Model Author zawiera klucz obcy do tabeli Book
 @Entity
 public class AuthorModel implements Serializable {
 
@@ -19,37 +19,28 @@ public class AuthorModel implements Serializable {
 
     @OneToMany(mappedBy = "author")
     private List<BookModel> books;
-
     // Getters and Setters
-
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public java.util.Date getBirthdate() {
         return birthdate;
     }
-
     public void setBirthdate(java.util.Date birthdate) {
         this.birthdate = birthdate;
     }
-
     public List<BookModel> getBooks() {
         return books;
     }
-
     public void setBooks(List<BookModel> books) {
         this.books = books;
     }
