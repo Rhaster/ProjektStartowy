@@ -1,3 +1,4 @@
+
 package com.example.projektstartowy.config;
 
 
@@ -56,5 +57,4 @@ public class Security {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    }
-
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wypożyczalnia Książek - Powitalna</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .header button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .header button:hover {
+            background-color: #c82333;
+        }
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            gap: 20px;
+        }
+        .main-content button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.2em;
+        }
+        .main-content button:hover {
+            background-color: #0056b3;
+        }
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-width: 100%;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+        }
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+        }
+        .chat-input button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+        }
+        .chat-input button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Wypożyczalnia Książek</h1>
+    <button onclick="logout()">Wyloguj</button>
+</div>
+<div class="main-content">
+    <button onclick="location.href='/addOrder'">Dodaj Zamówienie</button>
+    <button onclick="location.href='/viewOrders'">Przeglądaj Zamówienia</button>
+</div>
+<div class="chat-container">
+    <div class="chat-header">Chat</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Napisz wiadomość...">
+        <button onclick="sendMessage()">Wyślij</button>
+    </div>
+</div>
+
+<script>
+    function logout() {
+        location.href = '/logout';
+    }
+
+    function sendMessage() {
+        const messageInput = document.getElementById('chatInput');
+        const message = messageInput.value;
+        if (message.trim()) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            messageInput.value = '';
+            messageInput.focus();
+            ws.send(message);
+        }
+    }
+
+    const ws = new WebSocket('ws://localhost:8080/chat');
+    ws.onmessage = function(event) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = event.data;
+        chatMessages.appendChild(messageElement);
+    };
+</script>
+</body>
+</html>
