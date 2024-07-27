@@ -6,6 +6,7 @@ import com.example.projektstartowy.model.BookModel;
 import com.example.projektstartowy.repo.AuthorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,14 +19,18 @@ public class AuthorService {
         this.authorRepo = authorRepo;
     }
 
+    @Transactional
     public AuthorModel addAuthor(AuthorModel author, List<BookModel> books) {
-        if (books != null && !books.isEmpty()) {
+        if (books != null) {
             for (BookModel book : books) {
-                book.setAuthor(author);  // Ustaw autora dla każdej książki
+                if (book.getTitle() == null) {
+                    throw new IllegalArgumentException("Book title cannot be null");
+                }
+                book.setAuthor(author);
             }
-            author.setBooks(books);  // Ustaw książki dla autora
+            author.setBooks(books);
         }
-        return authorRepo.save(author);  // Zapisz autora razem z książkami
+        return authorRepo.save(author);
     }
 
     public List<AuthorModel> getAllAuthors() {

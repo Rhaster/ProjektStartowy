@@ -2,6 +2,7 @@ package com.example.projektstartowy.model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 // Model Author zawiera klucz obcy do tabeli Book
@@ -27,8 +28,8 @@ public class AuthorModel implements Serializable {
         this.books = books;
     }
 
-    @OneToMany(mappedBy = "author")
-    private List<BookModel> books;
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<BookModel> books = new ArrayList<>();
     // Getters and Setters
     public Long getId() {
         return id;

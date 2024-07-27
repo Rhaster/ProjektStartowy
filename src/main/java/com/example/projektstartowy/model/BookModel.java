@@ -1,5 +1,6 @@
 package com.example.projektstartowy.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -15,8 +16,9 @@ public class BookModel implements Serializable {
     @Column(name = "publication_date")
     @Temporal(TemporalType.DATE)
     private Date publicationDate;
-    @ManyToOne // Wielu do jednego bo jeden autor moze napisac wiele ksiazek
-    @JoinColumn(name = "author_id", nullable = false)
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "author_id")
     private AuthorModel author;
     // Gety i Sety dla ksiazki
     public Long getId() {

@@ -18,46 +18,56 @@ import java.util.List;
 @RequestMapping("/admin/author")
 public class AuthorResource {
 
-        private final AuthorService authorService;
+    private final AuthorService authorService;
+
     @Autowired
     private AuthorRepo authorRepo;
 
     @Autowired
-        public AuthorResource(AuthorService authorService) {
-            this.authorService = authorService;
-        }
+    private BookRepo bookRepository;
 
-        @GetMapping("/all")
-        public ResponseEntity<List<AuthorModel>> getAllAuthors() {
-            List<AuthorModel> authors = authorService.getAllAuthors();
-            return new ResponseEntity<>(authors, HttpStatus.OK);
-        }
+    @Autowired
+    public AuthorResource(AuthorService authorService) {
+        this.authorService = authorService;
+    }
 
-        @GetMapping("/find/{id}")
-        public ResponseEntity<AuthorModel> getAuthorById(@PathVariable("id") long id) {
-            AuthorModel author = authorService.getAuthorById(id);
-            return new ResponseEntity<>(author, HttpStatus.OK);
-        }
+    @GetMapping("/all")
+    public ResponseEntity<List<AuthorModel>> getAllAuthors() {
+        List<AuthorModel> authors = authorService.getAllAuthors();
+        return new ResponseEntity<>(authors, HttpStatus.OK);
+    }
 
-        @Autowired
-        private BookRepo bookRepository;
-        @PostMapping("/add")
-        public ResponseEntity<AuthorModel> addAuthor(@RequestBody AuthorModel author) {
+    @GetMapping("/find/{id}")
+    public ResponseEntity<AuthorModel> getAuthorById(@PathVariable("id") long id) {
+        AuthorModel author = authorService.getAuthorById(id);
+        return new ResponseEntity<>(author, HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<AuthorModel> addAuthor(@RequestBody AuthorModel author) {
+        try {
             List<BookModel> books = author.getBooks();
             AuthorModel newAuthor = authorService.addAuthor(author, books);
             return new ResponseEntity<>(newAuthor, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            // Log the error
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Log the error
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
-        @PutMapping("/update")
-        public ResponseEntity<AuthorModel> updateAuthor(@RequestBody AuthorModel author) {
-            AuthorModel updatedAuthor = authorService.updateAuthor(author);
-            return new ResponseEntity<>(updatedAuthor, HttpStatus.OK);
-        }
+    @PutMapping("/update")
+    public ResponseEntity<AuthorModel> updateAuthor(@RequestBody AuthorModel author) {
+        AuthorModel updatedAuthor = authorService.updateAuthor(author);
+        return new ResponseEntity<>(updatedAuthor, HttpStatus.OK);
+    }
 
-        @DeleteMapping("/delete/{id}")
-        public ResponseEntity<?> deleteAuthor(@PathVariable("id") long id) {
-            authorService.deleteAuthor(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteAuthor(@PathVariable("id") long id) {
+        authorService.deleteAuthor(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     }
 
