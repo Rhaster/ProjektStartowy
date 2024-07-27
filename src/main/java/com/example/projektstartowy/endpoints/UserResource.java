@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 // Kontroler api
 @RestController// Mapowanie po /user
-@RequestMapping("/user")
+@RequestMapping("admin/user")
 public class UserResource {
     private final UserService userService;  // zmienna do przechowania instancji klasy
 

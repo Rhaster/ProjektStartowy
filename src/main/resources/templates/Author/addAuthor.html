@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dodaj Autora</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      justify-content: center;
+      align-items: center;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    form input, form button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+    }
+    .book-fields {
+      margin-bottom: 10px;
+    }
+    .add-book-button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    .add-book-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<h1>Dodaj Autora</h1>
+<form id="addAuthorForm">
+  <input type="text" id="name" placeholder="Nazwa autora" required>
+  <input type="date" id="birthdate" placeholder="Data urodzenia" required>
+  <div id="bookContainer"></div>
+  <button type="submit">Dodaj</button>
+</form>
+<script>
+  function addBookFields() {
+    const bookContainer = document.getElementById('bookContainer');
+    const bookFields = document.createElement('div');
+    bookFields.className = 'book-fields';
+    bookFields.innerHTML = `
+      <input type="text" placeholder="Tytuł książki" class="book-title" required>
+      <input type="date" placeholder="Data publikacji" class="book-publishdate" required>
+    `;
+    bookContainer.appendChild(bookFields);
+  }
+
+  // Add a book field on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    addBookFields();
+  });
+
+  document.getElementById('addAuthorForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value;
+    const birthdate = document.getElementById('birthdate').value;
+
+    const books = [];
+    document.querySelectorAll('.book-fields').forEach(bookField => {
+      const title = bookField.querySelector('.book-title').value;
+      const publishdate = bookField.querySelector('.book-publishdate').value;
+      books.push({ title, publishdate });
+    });
+
+    fetch('/admin/author/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, birthdate, books })
+    })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Network response was not ok.');
+              }
+            })
+            .then(data => {
+              alert('Autor został dodany!');
+              window.location.href = '/admin/home';
+            })
+            .catch(error => console.error('Error:', error));
+  });
+</script>
+</body>
+</html>

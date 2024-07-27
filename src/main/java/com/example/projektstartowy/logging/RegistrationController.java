@@ -23,7 +23,7 @@ public class RegistrationController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new UserModel());
-        return "register";
+        return "register";  // przekierowanie na strone rejestracji
     }
 
     @PostMapping("/register/user")
