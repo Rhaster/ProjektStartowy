@@ -24,7 +24,7 @@ public class UserModel implements Serializable {
         this.password = password;
         this.role = role;
     }
-    // Getters and Setters
+    // Gety i setty
     public Long getId() {
         return id;
     }

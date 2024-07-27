@@ -11,28 +11,22 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepo orderRepo;
-
     @Autowired
     public OrderService(OrderRepo orderRepo) {
         this.orderRepo = orderRepo;
     }
-
     public OrderModel addOrder(OrderModel order) {
         return orderRepo.save(order);
     }
-
     public List<OrderModel> getAllOrders() {
         return orderRepo.findAll();
     }
-
     public OrderModel updateOrder(OrderModel order) {
         return orderRepo.save(order);
     }
-
     public void deleteOrder(Long id) {
         orderRepo.deleteById(id);
     }
-
     public OrderModel getOrderById(Long id) {
         return orderRepo.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order by id " + id + " was not found"));

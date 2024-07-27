@@ -22,7 +22,7 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       width: 300px;
     }
-    form input, form button {
+    form input, form button, form select {
       margin: 10px 0;
       padding: 10px;
       width: 100%;
@@ -30,7 +30,7 @@
     .book-fields {
       margin-bottom: 10px;
     }
-    .add-book-button {
+    .add-book-button, .add-book-fields {
       background-color: #007bff;
       color: white;
       border: none;
@@ -39,7 +39,7 @@
       border-radius: 4px;
       font-size: 1em;
     }
-    .add-book-button:hover {
+    .add-book-button:hover, .add-book-fields:hover {
       background-color: #0056b3;
     }
   </style>
@@ -47,59 +47,103 @@
 <body>
 <h1>Dodaj Autora</h1>
 <form id="addAuthorForm">
-  <input type="text" id="name" placeholder="Nazwa autora" required>
-  <input type="date" id="birthdate" placeholder="Data urodzenia" required>
+  <input type="text" id="name" name="name" placeholder="Nazwa autora" required autocomplete="name">
+  <input type="date" id="birthdate" name="birthdate" placeholder="Data urodzenia" required autocomplete="bday">
   <div id="bookContainer"></div>
+  <button type="button" class="add-book-fields" onclick="addBookFields()">Dodaj Książkę</button>
   <button type="submit">Dodaj</button>
 </form>
 <script>
-  function addBookFields() {
-    const bookContainer = document.getElementById('bookContainer');
-    const bookFields = document.createElement('div');
-    bookFields.className = 'book-fields';
-    bookFields.innerHTML = `
-      <input type="text" placeholder="Tytuł książki" class="book-title" required>
-      <input type="date" placeholder="Data publikacji" class="book-publishdate" required>
-    `;
-    bookContainer.appendChild(bookFields);
+  async function fetchBooks() {
+    try {
+      const response = await fetch('/book/all');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      return [];
+    }
   }
 
-  // Add a book field on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    addBookFields();
+  function addBookFields() {
+    fetchBooks().then(books => {
+      if (books && books.length > 0) {
+        const bookContainer = document.getElementById('bookContainer');
+        const bookFields = document.createElement('div');
+        bookFields.className = 'book-fields';
+
+        const select = document.createElement('select');
+        select.className = 'book-select';
+        select.required = true;
+
+        books.forEach(book => {
+          const option = document.createElement('option');
+          option.value = book.id;
+          option.textContent = book.title;
+          select.appendChild(option);
+        });
+
+        bookFields.appendChild(select);
+        bookContainer.appendChild(bookFields);
+      } else {
+        console.error('No books available to add');
+        alert('Brak dostępnych książek do dodania.');
+      }
+    }).catch(error => {
+      console.error('Error fetching books:', error);
+      alert('Wystąpił błąd podczas pobierania listy książek.');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    try {
+      const books = await fetchBooks();
+      if (books && books.length > 0) {
+        addBookFields();
+      } else {
+        console.error('No books available to load');
+        alert('Brak dostępnych książek.');
+      }
+    } catch (error) {
+      console.error('Error loading initial books:', error);
+      alert('Wystąpił błąd podczas ładowania początkowej listy książek.');
+    }
   });
 
-  document.getElementById('addAuthorForm').addEventListener('submit', function(event) {
+  document.getElementById('addAuthorForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     const name = document.getElementById('name').value;
     const birthdate = document.getElementById('birthdate').value;
 
     const books = [];
     document.querySelectorAll('.book-fields').forEach(bookField => {
-      const title = bookField.querySelector('.book-title').value;
-      const publishdate = bookField.querySelector('.book-publishdate').value;
-      books.push({ title, publishdate });
+      const bookId = bookField.querySelector('.book-select').value;
+      books.push({ id: bookId });
     });
 
-    fetch('/admin/author/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name, birthdate, books })
-    })
-            .then(response => {
-              if (response.ok) {
-                return response.json();
-              } else {
-                throw new Error('Network response was not ok.');
-              }
-            })
-            .then(data => {
-              alert('Autor został dodany!');
-              window.location.href = '/admin/home';
-            })
-            .catch(error => console.error('Error:', error));
+    try {
+      const response = await fetch('/admin/author/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, birthdate, books })
+      });
+
+      if (response.ok) {
+        alert('Autor został dodany!');
+        window.location.href = '/admin/home';
+      } else {
+        const errorData = await response.text();
+        console.error('Server error:', errorData);
+        alert('Wystąpił błąd podczas dodawania autora. Spróbuj ponownie.');
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      alert('Wystąpił błąd sieciowy. Sprawdź połączenie i spróbuj ponownie.');
+    }
   });
 </script>
 </body>

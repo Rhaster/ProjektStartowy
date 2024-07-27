@@ -14,6 +14,9 @@ public class AppflowControler {
     public String adminhome() {
         return "adminhome.html";  // Zwraca plik welcome.html z katalogu templates
     }
+
+
+    // ADMIN AUTHOR
     @GetMapping("/admin/author/addAuthor")
     public String addAuthor() {
         return "Author/addAuthor.html";  // Zwraca plik welcome.html z katalogu templates
@@ -22,4 +25,10 @@ public class AppflowControler {
     public String authorDetail() {
         return "Author/authorDetails.html";  // Zwraca plik welcome.html z katalogu templates
     }
+    // ADMIN USER
+    @GetMapping("/admin/user/addUsers")
+    public String addUser() {
+        return "User/addUser.html";
+    }
+
 }

@@ -2,6 +2,7 @@ package com.example.projektstartowy.endpoints;
 
 import com.example.projektstartowy.model.UserModel;
 import com.example.projektstartowy.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 // Kontroler api
 @RestController// Mapowanie po /user
-@RequestMapping("admin/user")
+@RequestMapping("/admin/user")
 public class UserResource {
     private final UserService userService;  // zmienna do przechowania instancji klasy
 
@@ -37,6 +38,7 @@ public class UserResource {
         return new ResponseEntity<>(newUser, HttpStatus.OK); // zwrócenie http status CREATED
     }
     @DeleteMapping("/delete/{id}")
+    @Transactional
     public ResponseEntity<?> deleteUser(@PathVariable("id") long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK); // zwrócenie http status OK po usunieciu

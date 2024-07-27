@@ -7,6 +7,7 @@ import com.example.projektstartowy.repo.BookRepo;
 import com.example.projektstartowy.repo.AuthorRepo;
 import com.example.projektstartowy.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/author/")
+@RequestMapping("/admin/author")
 public class AuthorResource {
 
         private final AuthorService authorService;
+    @Autowired
+    private AuthorRepo authorRepo;
 
-        @Autowired
+    @Autowired
         public AuthorResource(AuthorService authorService) {
             this.authorService = authorService;
         }
@@ -38,20 +41,11 @@ public class AuthorResource {
 
         @Autowired
         private BookRepo bookRepository;
-
         @PostMapping("/add")
-        public AuthorModel addAuthor(@RequestBody AuthorModel author) {
-            AuthorModel savedAuthor = authorService.addAuthor(author);
-
+        public ResponseEntity<AuthorModel> addAuthor(@RequestBody AuthorModel author) {
             List<BookModel> books = author.getBooks();
-            if (books != null) {
-                for (BookModel book : books) {
-                    book.setAuthor(savedAuthor);
-                    bookRepository.save(book);
-                }
-            }
-
-            return savedAuthor;
+            AuthorModel newAuthor = authorService.addAuthor(author, books);
+            return new ResponseEntity<>(newAuthor, HttpStatus.CREATED);
         }
 
         @PutMapping("/update")
