@@ -1,6 +1,9 @@
 package com.example.projektstartowy.endpoints;
 
+import com.example.projektstartowy.DTO.AuthorDTO;
+import com.example.projektstartowy.DTO.BookDTO;
 import com.example.projektstartowy.exception.BookNotFoundException;
+import com.example.projektstartowy.model.AuthorModel;
 import com.example.projektstartowy.model.BookModel;
 import com.example.projektstartowy.model.UserModel;
 import com.example.projektstartowy.service.BookService;
@@ -20,11 +23,39 @@ public class BookResource {
     public BookResource(BookService bookService) {
         this.bookService = bookService;
     }
-
     @GetMapping("/all")
-    public ResponseEntity<List<BookModel>> getAllBooks() {
-        List<BookModel> books = bookService.getAllBooks();
+    public ResponseEntity<List<BookDTO>> getAllBooks() {
+        List<BookDTO> books = bookService.getAllBooks();
         return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
+        BookModel book = new BookModel();
+        book.setTitle(bookDTO.getTitle());
+        book.setPublicationDate(bookDTO.getPublicationDate());
+        if (bookDTO.getAuthor() != null) {
+            AuthorModel author = new AuthorModel();
+            author.setId(bookDTO.getAuthor().getId()); // Jeżeli masz odpowiednie metody w repozytorium
+            book.setAuthor(author);
+        }
+        BookModel newBook = bookService.addBook(book);
+        return new ResponseEntity<>(convertToDTO(newBook), HttpStatus.CREATED);
+    }
+
+    private BookDTO convertToDTO(BookModel book) {
+        BookDTO dto = new BookDTO();
+        dto.setId(book.getId());
+        dto.setTitle(book.getTitle());
+        dto.setPublicationDate(book.getPublicationDate());
+
+        if (book.getAuthor() != null) {
+            AuthorDTO authorDTO = new AuthorDTO();
+            authorDTO.setId(book.getAuthor().getId());
+            authorDTO.setName(book.getAuthor().getName());
+            dto.setAuthor(authorDTO);
+        }
+        return dto;
     }
 
     @GetMapping("/find/{id}")
@@ -33,11 +64,7 @@ public class BookResource {
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<BookModel> addBook(@RequestBody BookModel book) {
-        BookModel newBook = bookService.addBook(book);
-        return new ResponseEntity<>(newBook, HttpStatus.CREATED);
-    }
+
 
     @PutMapping("/update")
     public ResponseEntity<BookModel> updateBook(@RequestBody BookModel book) {

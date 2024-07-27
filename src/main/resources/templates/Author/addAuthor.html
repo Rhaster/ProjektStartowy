@@ -3,147 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dodaj Autora</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      margin: 0;
-      justify-content: center;
-      align-items: center;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 300px;
-    }
-    form input, form button, form select {
-      margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-    }
-    .book-fields {
-      margin-bottom: 10px;
-    }
-    .add-book-button, .add-book-fields {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-    .add-book-button:hover, .add-book-fields:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  <title>Author Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>Dodaj Autora</h1>
-<form id="addAuthorForm">
-  <input type="text" id="name" name="name" placeholder="Nazwa autora" required autocomplete="name">
-  <input type="date" id="birthdate" name="birthdate" placeholder="Data urodzenia" required autocomplete="bday">
-  <div id="bookContainer"></div>
-  <button type="button" class="add-book-fields" onclick="addBookFields()">Dodaj Książkę</button>
-  <button type="submit">Dodaj</button>
-</form>
+<div class="container mt-5">
+  <h1>Author Management</h1>
+  <form id="authorForm" class="mb-4">
+    <div class="mb-3">
+      <label for="authorId" class="form-label">Author ID</label>
+      <input type="text" class="form-control" id="authorId" readonly>
+    </div>
+    <div class="mb-3">
+      <label for="authorName" class="form-label">Name</label>
+      <input type="text" class="form-control" id="authorName" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Author</button>
+    <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
+  </form>
+
+  <h2>All Authors</h2>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="authorTableBody">
+    <!-- Authors will be dynamically added here -->
+    </tbody>
+  </table>
+</div>
+
 <script>
-  async function fetchBooks() {
-    try {
-      const response = await fetch('/book/all');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching books:', error);
-      return [];
-    }
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const authorForm = document.getElementById('authorForm');
+    const authorTableBody = document.getElementById('authorTableBody');
 
-  function addBookFields() {
-    fetchBooks().then(books => {
-      if (books && books.length > 0) {
-        const bookContainer = document.getElementById('bookContainer');
-        const bookFields = document.createElement('div');
-        bookFields.className = 'book-fields';
+    authorForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-        const select = document.createElement('select');
-        select.className = 'book-select';
-        select.required = true;
+      const author = {
+        id: document.getElementById('authorId').value,
+        name: document.getElementById('authorName').value
+      };
 
-        books.forEach(book => {
-          const option = document.createElement('option');
-          option.value = book.id;
-          option.textContent = book.title;
-          select.appendChild(option);
+      const method = author.id ? 'PUT' : 'POST';
+      const endpoint = author.id ? `/admin/author/update` : `/admin/author/add`;
+
+      try {
+        const response = await fetch(endpoint, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(author),
         });
 
-        bookFields.appendChild(select);
-        bookContainer.appendChild(bookFields);
-      } else {
-        console.error('No books available to add');
-        alert('Brak dostępnych książek do dodania.');
+        if (response.ok) {
+          alert('Author saved successfully');
+          resetForm();
+          loadAuthors();
+        } else {
+          const errorData = await response.json();
+          alert('Error saving author: ' + errorData.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving author');
       }
-    }).catch(error => {
-      console.error('Error fetching books:', error);
-      alert('Wystąpił błąd podczas pobierania listy książek.');
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', async function() {
-    try {
-      const books = await fetchBooks();
-      if (books && books.length > 0) {
-        addBookFields();
-      } else {
-        console.error('No books available to load');
-        alert('Brak dostępnych książek.');
-      }
-    } catch (error) {
-      console.error('Error loading initial books:', error);
-      alert('Wystąpił błąd podczas ładowania początkowej listy książek.');
-    }
-  });
-
-  document.getElementById('addAuthorForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const name = document.getElementById('name').value;
-    const birthdate = document.getElementById('birthdate').value;
-
-    const books = [];
-    document.querySelectorAll('.book-fields').forEach(bookField => {
-      const bookId = bookField.querySelector('.book-select').value;
-      books.push({ id: bookId });
     });
 
-    try {
-      const response = await fetch('/admin/author/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, birthdate, books })
-      });
+    async function loadAuthors() {
+      try {
+        const response = await fetch('/admin/author/all');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const authors = await response.json();
+        authorTableBody.innerHTML = '';
 
-      if (response.ok) {
-        alert('Autor został dodany!');
-        window.location.href = '/admin/home';
-      } else {
-        const errorData = await response.text();
-        console.error('Server error:', errorData);
-        alert('Wystąpił błąd podczas dodawania autora. Spróbuj ponownie.');
+        if (Array.isArray(authors)) {
+          authors.forEach(author => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                            <td>${author.id}</td>
+                            <td>${author.name}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editAuthor(${author.id})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAuthor(${author.id})">Delete</button>
+                            </td>
+                        `;
+            authorTableBody.appendChild(row);
+          });
+        } else {
+          console.error('Invalid authors data', authors);
+        }
+      } catch (error) {
+        console.error('Error:', error);
       }
-    } catch (error) {
-      console.error('Network error:', error);
-      alert('Wystąpił błąd sieciowy. Sprawdź połączenie i spróbuj ponownie.');
     }
+
+    window.editAuthor = async (id) => {
+      try {
+        const response = await fetch(`/admin/author/find/${id}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const author = await response.json();
+
+        document.getElementById('authorId').value = author.id;
+        document.getElementById('authorName').value = author.name;
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error loading author details');
+      }
+    };
+
+    window.deleteAuthor = async (id) => {
+      if (confirm('Are you sure you want to delete this author?')) {
+        try {
+          const response = await fetch(`/admin/author/delete/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (response.ok) {
+            alert('Author deleted successfully');
+            loadAuthors();
+          } else {
+            alert('Error deleting author');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error deleting author');
+        }
+      }
+    };
+
+    window.resetForm = () => {
+      authorForm.reset();
+      document.getElementById('authorId').value = '';
+    };
+
+    loadAuthors();
   });
 </script>
 </body>

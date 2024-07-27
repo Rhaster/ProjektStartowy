@@ -17,7 +17,7 @@ public class BookModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date publicationDate;
     @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
     private AuthorModel author;
     // Gety i Sety dla ksiazki

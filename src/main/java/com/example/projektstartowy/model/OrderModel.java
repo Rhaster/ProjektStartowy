@@ -18,7 +18,7 @@ public class OrderModel {
     @Temporal(TemporalType.DATE)
     private Date rateDateEnd;
     @ManyToOne  // Wielu do jednego bo jeden klient moze miec wiele zamówien
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false,updatable = false)
     private UserModel customer;
     // Getty i Setty
     public Long getOrderID() {

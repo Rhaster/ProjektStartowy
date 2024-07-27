@@ -98,6 +98,7 @@
                     throw new Error('Network response was not ok');
                 }
                 const books = await response.json();
+                console.log('Raw JSON response:', books);
                 bookTableBody.innerHTML = '';
 
                 if (Array.isArray(books)) {

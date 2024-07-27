@@ -35,5 +35,9 @@ public class AppflowControler {
     public String addBook() {
         return "Book/manageBooks.html";
     }
-
+    // ADMIN ORDERS
+    @GetMapping("/admin/orders/manageOrders")
+    public String manageOrders() {
+        return "orders/manageOrders.html";
+    }
 }

@@ -60,4 +60,6 @@ public class UserModel implements Serializable {
         return "User [id=" + id + ", username=" + username +
                 ", email=" + email + ", password=" + password + "]";
     }
+
+
 }
