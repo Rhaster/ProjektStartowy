@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Rejestracja</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
             margin-bottom: 20px;
             color: #333;
         }
-        .login-container {
+        .register-container {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -41,26 +41,22 @@
             display: block;
             margin-bottom: 5px;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        .form-group input[type="submit"] {
-            background-color: #007bff;
+        .form-group button {
+            background-color: #28a745;
             color: white;
             border: none;
             cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 4px;
             margin-top: 10px;
         }
-        .form-group input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .form-group .register-button {
-            background-color: #28a745;
-        }
-        .form-group .register-button:hover {
+        .form-group button:hover {
             background-color: #218838;
         }
         .error-message {
@@ -71,22 +67,30 @@
 </head>
 <body>
 <div class="header">Wypożyczalnia Książek</div>
-<div class="login-container">
-    <h2>Login</h2>
-    <form action="/login" method="post">
+<div class="register-container">
+    <h2>Rejestracja</h2>
+    <form action="#" th:action="@{/register/user}" th:object="${user}" method="post">
         <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" th:field="*{username}" required="required"/>
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" th:field="*{email}" required="required"/>
         </div>
         <div class="form-group">
-            <input type="submit" value="Login">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" th:field="*{password}" required="required"/>
         </div>
         <div class="form-group">
-            <input type="button" value="Rejestracja" class="register-button" onclick="window.location.href='/register/user'">
+            <label for="role">Rola:</label>
+            <select id="role" th:field="*{role}">
+                <option value="USER">User</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="submit">Zarejestruj się</button>
         </div>
         <div class="error-message">
             <!-- Error messages will be displayed here -->

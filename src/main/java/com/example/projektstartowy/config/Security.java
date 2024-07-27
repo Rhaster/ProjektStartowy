@@ -1,64 +1,80 @@
 package com.example.projektstartowy.config;
 
-
+import com.example.projektstartowy.jwtUtils.JwtRequestFilter;
 import com.example.projektstartowy.logging.AuthenticationSuccessHandler;
 import com.example.projektstartowy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 
 
 @Configuration
 @EnableWebSecurity
 public class Security {
 
-    // Nadpisanie domyslnego zabezpieczenia Security
+    @Autowired
+    @Lazy
+    private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
     private UserService userService;
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return  http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(registry->
-    {
-        registry.requestMatchers("/home","/register/**","/login").permitAll(); // zezwól na wejscie kazdemu na pole rejestracji
-        registry.requestMatchers("/admin/**").hasRole("ADMIN"); // zezwól na wejscie do panelu admina tylko adminom
-        registry.requestMatchers("/user/**").hasRole("USER"); // zezwól na wejscie do panelu usera dla userów
-        registry.anyRequest().authenticated(); // wszystko poza musi byc autoryzowane
-    }).formLogin(httpSecurityFormLoginConfigurer -> {
-        httpSecurityFormLoginConfigurer
-                .loginPage("/login")
-                .successHandler(new AuthenticationSuccessHandler())
-                .permitAll();
-    }).build();
-}
-@Bean
-public UserService  userDetailsService() {
-    return  userService;
-}
 
-@Bean
-public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService());
-    authProvider.setPasswordEncoder(passwordEncoder());
-    return authProvider;
-}
-@Bean
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(registry -> {
+                    // Endpoint do logowania JWT powinien być dostępny bez autoryzacji formularza logowania
+                    registry.requestMatchers("/auth/login").permitAll();
+                    // Pozwól na dostęp do innych publicznych endpointów
+                    registry.requestMatchers("/home", "/register/**").permitAll();
+                    // Ogranicz dostęp do chronionych zasobów
+                    registry.requestMatchers("/admin/**").hasRole("ADMIN");
+                    registry.requestMatchers("/user/**").hasRole("USER");
+                    registry.anyRequest().authenticated();
+                })
+                .formLogin(httpSecurityFormLoginConfigurer -> {
+                    // Konfiguracja formularza logowania
+                    httpSecurityFormLoginConfigurer
+                            .loginPage("/login")
+                            .successHandler(new AuthenticationSuccessHandler())
+                            .permitAll();
+                })
+                .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // Jeśli potrzebna sesja
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
+    public UserService userDetailsService() {
+        return userService;
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-}
+        return new BCryptPasswordEncoder();
+    }
 
 }

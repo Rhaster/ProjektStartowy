@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modyfikuj Autora</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      justify-content: center;
+      align-items: center;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    form input, form button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<h1>Modyfikuj Autora</h1>
+<form id="updateAuthorForm">
+  <input type="number" id="id" placeholder="ID autora" required>
+  <input type="text" id="name" placeholder="Nazwa autora" required>
+  <input type="text" id="bio" placeholder="Biografia autora" required>
+  <button type="submit">Zaktualizuj</button>
+</form>
+<script>
+  document.getElementById('updateAuthorForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const id = document.getElementById('id').value;
+    const name = document.getElementById('name').value;
+    const bio = document.getElementById('bio').value;
+    fetch('/admin/author/update', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id, name, bio })
+    })
+            .then(response => response.json())
+            .then(data => {
+              alert('Autor został zaktualizowany!');
+              window.location.href = '/admin/manageAuthors';
+            })
+            .catch(error => console.error('Error:', error));
+  });
+</script>
+</body>
+</html>

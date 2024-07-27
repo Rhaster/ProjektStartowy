@@ -9,16 +9,13 @@ public class UserModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
-    private Long id;
+    private Long id; // Klucz główny
 
     private String username;
-
-
     private String email;
     private String password;
-    private String role;
-
-    // Constructors (optional)
+    private String role; // ADMIN lub USER
+    // Konstruktor
     public UserModel() {}
 
     public UserModel( String username, String email, String password,String role) {
@@ -27,7 +24,7 @@ public class UserModel implements Serializable {
         this.password = password;
         this.role = role;
     }
-    // Getters and Setters
+    // Gety i setty
     public Long getId() {
         return id;
     }
@@ -40,36 +37,29 @@ public class UserModel implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String name) {
         this.username = name;
     }
-
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
-
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
-
-
-
     @Override
     public String toString() {
         return "User [id=" + id + ", username=" + username +
                 ", email=" + email + ", password=" + password + "]";
     }
+
+
 }

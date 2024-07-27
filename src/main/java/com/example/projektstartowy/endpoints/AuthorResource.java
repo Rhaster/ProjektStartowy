@@ -2,7 +2,12 @@ package com.example.projektstartowy.endpoints;
 
 
 import com.example.projektstartowy.model.AuthorModel;
+import com.example.projektstartowy.model.BookModel;
+import com.example.projektstartowy.repo.BookRepo;
+import com.example.projektstartowy.repo.AuthorRepo;
 import com.example.projektstartowy.service.AuthorService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,10 +15,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/author")
+@RequestMapping("/admin/author")
 public class AuthorResource {
+
     private final AuthorService authorService;
 
+    @Autowired
+    private AuthorRepo authorRepo;
+
+    @Autowired
+    private BookRepo bookRepository;
+
+    @Autowired
     public AuthorResource(AuthorService authorService) {
         this.authorService = authorService;
     }
@@ -32,8 +45,17 @@ public class AuthorResource {
 
     @PostMapping("/add")
     public ResponseEntity<AuthorModel> addAuthor(@RequestBody AuthorModel author) {
-        AuthorModel newAuthor = authorService.addAuthor(author);
-        return new ResponseEntity<>(newAuthor, HttpStatus.CREATED);
+        try {
+            List<BookModel> books = author.getBooks();
+            AuthorModel newAuthor = authorService.addAuthor(author, books);
+            return new ResponseEntity<>(newAuthor, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            // Log the error
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Log the error
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/update")
@@ -47,4 +69,5 @@ public class AuthorResource {
         authorService.deleteAuthor(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-}
+    }
+

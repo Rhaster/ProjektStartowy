@@ -10,6 +10,6 @@ public class LoginControler {
     }
     @GetMapping("/logout")
     public String handleLogout() {
-        return "customloginpage.html";
+        return "customloginpage.html";  // przekierowanie na customowastronelogowania
     }
 }
