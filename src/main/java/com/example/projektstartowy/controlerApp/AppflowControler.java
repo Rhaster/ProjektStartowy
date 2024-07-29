@@ -40,4 +40,9 @@ public class AppflowControler {
     public String manageOrders() {
         return "orders/manageOrders.html";
     }
+    // USER ORDERS
+    @GetMapping("/user/viewOrders")
+    public String addOrder() {
+        return "Orders/addOrder.html";
+    }
 }
