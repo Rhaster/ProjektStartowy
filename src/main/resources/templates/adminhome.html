@@ -111,15 +111,18 @@
     </style>
 </head>
 <body>
+
 <div class="header">
     <h1>Panel Admina - Wypożyczalnia Książek</h1>
     <button onclick="logout()">Wyloguj</button>
 </div>
+<img th:src="${catImageUrl}" alt="Random Cat" width="300" height="300"/>
 <div class="main-content">
+
     <button onclick="location.href='/admin/user/addUsers'">Modyfikuj Użytkowników</button>
     <button onclick="location.href='/admin/books/addBooks'">Modyfikuj  Książki</button>
     <button onclick="location.href='/admin/author/addAuthor'">Modyfikuj  Autorów</button>
-    <button onclick="location.href='/admin/orders/manageOrders'">Modyfikój zamówienia</button>
+    <button onclick="location.href='/admin/orders/manageOrders'">Modyfikuj zamówienia</button>
 </div>
 <div class="chat-container">
     <div class="chat-header">Chat</div>

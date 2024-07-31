@@ -13,12 +13,13 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/auth")
 public class JwtAuthController {
 
     @Autowired
-    private AuthenticationProvider authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -29,17 +30,20 @@ public class JwtAuthController {
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody UserModel userModel) {
         try {
-            // Autoryzacja
+            System.out.println("Attempting to authenticate user: " + userModel.getUsername());
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userModel.getUsername(), userModel.getPassword())
             );
 
-            // Generowanie JWT
+            // Log successful authentication
+            System.out.println("Authentication successful for user: " + userModel.getUsername());
+
             UserDetails userDetails = userService.loadUserByUsername(userModel.getUsername());
             String jwt = jwtUtil.generateToken(userDetails);
-
             return ResponseEntity.ok(new AuthResponse(jwt));
         } catch (AuthenticationException e) {
+            System.out.println("Authentication failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
         }
     }

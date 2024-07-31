@@ -30,6 +30,7 @@ public class UserAddons {
         return ResponseEntity.ok(user);
     }
     @RequestMapping("/orders/all")
+    @GetMapping("/orders/all")
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
 
         List<OrderDTO> orders = orderService.getAllOrders();
