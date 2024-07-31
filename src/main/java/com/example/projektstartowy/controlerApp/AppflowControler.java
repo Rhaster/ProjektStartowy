@@ -1,17 +1,30 @@
 package com.example.projektstartowy.controlerApp;
+import com.example.projektstartowy.API.ImageService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Controller
 public class AppflowControler {
 
+    private final ImageService catService;
+
+    public AppflowControler(ImageService catService) {
+        this.catService = catService;
+    }
     @GetMapping("/user/home")
-    public String userhome() {
+    public String userhome(Model model) {
+
+        Mono<String> catImageUrl = catService.getRandomCatImageUrl();
+        model.addAttribute("catImageUrl", catImageUrl.block());
         return "userhome.html";  // Zwraca plik welcome.html z katalogu templates
     }
     @GetMapping("/admin/home")
-    public String adminhome() {
+    public String adminhome(Model model) {
+        Mono<String> catImageUrl = catService.getRandomCatImageUrl();
+        model.addAttribute("catImageUrl", catImageUrl.block());
         return "adminhome.html";  // Zwraca plik welcome.html z katalogu templates
     }
 
