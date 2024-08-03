@@ -1,1 +1,1 @@
-Działaja autoryzacja(bez jwt),baza danych, front dla admina jest juz zrobiony
+Działaja autoryzacja,baza danych, podpiete api ze zdjeciami kotów(innego pomysłu nie miałem), websocket do zrobienia 
